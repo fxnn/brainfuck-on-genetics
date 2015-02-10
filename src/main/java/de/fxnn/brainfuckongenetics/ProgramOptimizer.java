@@ -1,5 +1,6 @@
 package de.fxnn.brainfuckongenetics;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import com.google.common.base.Function;
@@ -12,19 +13,25 @@ public class ProgramOptimizer {
 
   private static final Pattern ENDLESS_LOOP_PATTERN = Pattern.compile("\\[\\]");
 
-  private static final Pattern INCREMENT_DECREMENT_PATTERN = Pattern.compile("\\+-");
+  private static final Pattern INCREMENT_DECREMENT_PATTERN = Pattern.compile("\\+-|-\\+");
 
-  private static final Pattern DECREMENT_INCREMENT_PATTERN = Pattern.compile("-\\+");
+  private static final Pattern FORWARD_BACKWARD_PATTERN = Pattern.compile("><|<>");
 
   private static final Function<String, String> OPTIMIZATION_FUNCTION = Functions
       .compose(ProgramOptimizer::removeEndlessLoops,
-          Functions.compose(ProgramOptimizer::removeDecrementsIncrement, ProgramOptimizer::removeIncrementDecrements));
+          Functions.compose(ProgramOptimizer::removeForwardBackwards, ProgramOptimizer::removeIncrementDecrements));
 
   public StringProgram optimizeProgram(Program program) {
 
     String programSource = TreePrograms.toString(program);
 
-    String optimizedProgramSource = OPTIMIZATION_FUNCTION.apply(programSource);
+    String optimizedProgramSource = programSource;
+    do {
+
+      programSource = optimizedProgramSource;
+      optimizedProgramSource = OPTIMIZATION_FUNCTION.apply(programSource);
+
+    } while (!Objects.equals(optimizedProgramSource, programSource));
 
     return new StringProgram(optimizedProgramSource);
 
@@ -38,8 +45,8 @@ public class ProgramOptimizer {
     return INCREMENT_DECREMENT_PATTERN.matcher(input).replaceAll("");
   }
 
-  protected static String removeDecrementsIncrement(String input) {
-    return DECREMENT_INCREMENT_PATTERN.matcher(input).replaceAll("");
+  protected static String removeForwardBackwards(String input) {
+    return FORWARD_BACKWARD_PATTERN.matcher(input).replaceAll("");
   }
 
 }
