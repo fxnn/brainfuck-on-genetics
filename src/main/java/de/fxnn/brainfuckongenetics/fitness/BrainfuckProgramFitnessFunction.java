@@ -3,13 +3,12 @@ package de.fxnn.brainfuckongenetics.fitness;
 import java.io.ByteArrayInputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.nio.charset.StandardCharsets;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import de.fxnn.brainfuck.ProgramBuilder;
 import de.fxnn.brainfuck.program.Program;
-import de.fxnn.brainfuck.tape.InfiniteCharacterTape;
+import de.fxnn.brainfuck.tape.InfiniteSignedIntegerTape;
 import de.fxnn.brainfuck.tape.TapeEofBehaviour;
 import de.fxnn.brainfuckongenetics.ProgramOptimizer;
 import de.fxnn.genetics.fitness.FitnessFunction;
@@ -30,7 +29,7 @@ public class BrainfuckProgramFitnessFunction implements FitnessFunction<Program>
     ProgramBuilder programBuilder = new ProgramBuilder();
     programBuilder.withInput(dataInputFrom(new byte[0]));
     programBuilder.withOutput(output);
-    programBuilder.withTape(new InfiniteCharacterTape(StandardCharsets.UTF_8, TapeEofBehaviour.READS_ZERO));
+    programBuilder.withTape(new InfiniteSignedIntegerTape(TapeEofBehaviour.READS_ZERO));
     programBuilder.withProgram(optimizedProgram);
 
     programBuilder.buildProgramExecutor().run();
