@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.stream.DoubleStream;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
@@ -31,13 +32,18 @@ public class GenerationWithConcurrentFitnessFunction<Solution> implements Genera
   }
 
   @Override
-  public Set<Solution> getSolutions() {
+  public Collection<Solution> getSolutions() {
     return fitnessPerSolution.keySet();
   }
 
   @Override
   public Collection<Solution> getSelectedSolutions() {
     return selectedSolutions;
+  }
+
+  @Override
+  public DoubleStream streamFitnessValues() {
+    return fitnessPerSolution.keySet().stream().mapToDouble(this::getFitness);
   }
 
   @Override

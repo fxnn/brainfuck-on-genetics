@@ -1,6 +1,7 @@
 package de.fxnn.genetics.generation;
 
 import java.util.Collection;
+import java.util.stream.DoubleStream;
 
 public interface Generation<Solution> {
 
@@ -15,6 +16,8 @@ public interface Generation<Solution> {
   Collection<Solution> getSelectedSolutions();
 
   double getFitness(Solution solution);
+
+  DoubleStream streamFitnessValues();
 
   void addSolution(Solution solution);
 

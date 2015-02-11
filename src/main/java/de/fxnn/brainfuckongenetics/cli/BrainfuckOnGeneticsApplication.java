@@ -12,10 +12,11 @@ import de.fxnn.brainfuckongenetics.ProgramOptimizer;
 import de.fxnn.brainfuckongenetics.fitness.BrainfuckProgramFitnessFunction;
 import de.fxnn.brainfuckongenetics.fitness.LinearComputationFitnessFunction;
 import de.fxnn.brainfuckongenetics.initialization.BrainfuckGenerationFactory;
+import de.fxnn.genetics.GeneticAlgorithmConfiguration;
 import de.fxnn.genetics.fitness.FitnessFunction;
 import de.fxnn.genetics.generation.Generation;
 import de.fxnn.genetics.generation.GenerationWithConcurrentFitnessFunction;
-import de.fxnn.genetics.initialization.GenerationFactoryConfiguration;
+import de.fxnn.genetics.selection.LinearProbabilityGenerationSelector;
 
 public class BrainfuckOnGeneticsApplication {
 
@@ -26,7 +27,37 @@ public class BrainfuckOnGeneticsApplication {
 
   public static void main(String[] args) throws ExecutionException, InterruptedException {
 
-    Generation<Program> generation = initializeGeneration(1, 1000, 10);
+    GeneticAlgorithmConfiguration<Program> configuration = new GeneticAlgorithmConfiguration<Program>() {
+
+      @Override
+      public FitnessFunction<Program> getFitnessFunction() {
+        return new BrainfuckProgramFitnessFunction(new LinearComputationFitnessFunction());
+      }
+
+      @Override
+      public int getPopulationSize() {
+        return 1000;
+      }
+
+      @Override
+      public int getNumberOfGenerationRounds() {
+        return 100;
+      }
+
+      @Override
+      public long getRandomSeed() {
+        return 2398472349L;
+      }
+
+      @Override
+      public double getSelectionRatio() {
+        return 0.1;
+      }
+    };
+
+    Generation<Program> generation = initializeGeneration(1, configuration);
+
+    selectSolutions(configuration, generation);
 
     printGeneration(generation);
 
@@ -54,9 +85,10 @@ public class BrainfuckOnGeneticsApplication {
 
     ProgramOptimizer programOptimizer = new ProgramOptimizer();
     for (Program program : generation.getSolutions()) {
+      boolean selected = generation.getSelectedSolutions().contains(program);
       double fitness = generation.getFitness(program);
       if (fitness > Double.NEGATIVE_INFINITY) {
-        System.out.println("[" + fitness + "] " + programOptimizer.optimizeProgram(program).getProgram());
+        System.out.println((selected ? "X" : " ") + " [" + fitness + "] " + programOptimizer.optimizeProgram(program).getProgram());
       }
     }
     long duration = System.currentTimeMillis() - startMillis;
@@ -66,12 +98,24 @@ public class BrainfuckOnGeneticsApplication {
 
   }
 
-  protected static Generation<Program> initializeGeneration(int timeoutInSeconds, int populationSize,
-      int numberOfGenerationRounds) {
+  protected static void selectSolutions(GeneticAlgorithmConfiguration<Program> configuration,
+      Generation<Program> generation) {
+
+    long startMillis = System.currentTimeMillis();
+    new LinearProbabilityGenerationSelector().selectSolutions(generation, configuration);
+    long duration = System.currentTimeMillis() - startMillis;
+
+    System.out.println("Selection completed in " + duration + " ms");
+    System.out.println();
+
+  }
+
+  protected static Generation<Program> initializeGeneration(int timeoutInSeconds,
+      final GeneticAlgorithmConfiguration<Program> configuration) {
 
     long startMillis = System.currentTimeMillis();
     Generation<Program> generation = createBrainfuckGenerationFactory(timeoutInSeconds, TimeUnit.SECONDS)
-        .initializeGeneration(createGenerationFactoryConfiguration(populationSize, numberOfGenerationRounds));
+        .initializeGeneration(configuration);
     long duration = System.currentTimeMillis() - startMillis;
 
     System.out.println("Creating generation completed in " + duration + " ms");
@@ -87,32 +131,6 @@ public class BrainfuckOnGeneticsApplication {
     return new BrainfuckGenerationFactory(EXECUTOR_SERVICE, TERMINATING_EXECUTOR_SERVICE, timeoutDuration,
         timeoutTimeUnit);
 
-  }
-
-  protected static GenerationFactoryConfiguration<Program> createGenerationFactoryConfiguration(
-      final int populationSize, final int numberOfGenerationRounds) {
-    return new GenerationFactoryConfiguration<Program>() {
-
-      @Override
-      public FitnessFunction<Program> getFitnessFunction() {
-        return new BrainfuckProgramFitnessFunction(new LinearComputationFitnessFunction());
-      }
-
-      @Override
-      public int getPopulationSize() {
-        return populationSize;
-      }
-
-      @Override
-      public int getNumberOfGenerationRounds() {
-        return numberOfGenerationRounds;
-      }
-
-      @Override
-      public long getRandomSeed() {
-        return 2398472349L;
-      }
-    };
   }
 
 }

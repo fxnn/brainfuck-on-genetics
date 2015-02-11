@@ -3,6 +3,7 @@ package de.fxnn.genetics;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.DoubleStream;
 
 import de.fxnn.genetics.breeding.GenerationBreeder;
 import de.fxnn.genetics.generation.Generation;
@@ -30,7 +31,7 @@ public class GeneticAlgorithmTest {
   GenerationFactory<Boolean> generationFactory;
 
   @Mock
-  GenerationSelector<Boolean> generationSelector;
+  GenerationSelector generationSelector;
 
   @Mock
   GenerationBreeder<Boolean> generationBreeder;
@@ -76,7 +77,7 @@ public class GeneticAlgorithmTest {
 
     Mockito.verify(generationFactory).initializeGeneration(geneticAlgorithmConfiguration);
     Mockito.verify(terminationCondition, Mockito.times(2)).isTerminationConditionReached(anyGeneration());
-    Mockito.verify(generationSelector).selectSolutions(firstGeneration);
+    Mockito.verify(generationSelector).selectSolutions(firstGeneration, geneticAlgorithmConfiguration);
     Mockito.verify(generationBreeder).breedNewGeneration(firstGeneration);
 
     Assert.assertEquals(secondGeneration, result);
@@ -121,6 +122,11 @@ public class GeneticAlgorithmTest {
         }
 
         return 0.0;
+      }
+
+      @Override
+      public DoubleStream streamFitnessValues() {
+        throw new UnsupportedOperationException();
       }
 
       @Override

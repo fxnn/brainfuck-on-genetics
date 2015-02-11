@@ -2,8 +2,8 @@ package de.fxnn.genetics.selection;
 
 import de.fxnn.genetics.generation.Generation;
 
-public interface GenerationSelector<Solution> {
+public interface GenerationSelector {
 
-  void selectSolutions(Generation<Solution> generation);
+  <S> void selectSolutions(Generation<S> generation, GenerationSelectorConfiguration generationSelectorConfiguration);
 
 }

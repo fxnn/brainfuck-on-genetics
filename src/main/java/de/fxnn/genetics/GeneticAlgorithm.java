@@ -18,7 +18,7 @@ public class GeneticAlgorithm<Solution> implements Callable<Generation<Solution>
 
   private final GenerationFactory<Solution> generationFactory;
 
-  private final GenerationSelector<Solution> generationSelector;
+  private final GenerationSelector generationSelector;
 
   private final GenerationBreeder<Solution> generationBreeder;
 
@@ -30,7 +30,7 @@ public class GeneticAlgorithm<Solution> implements Callable<Generation<Solution>
 
     while (!terminationCondition.isTerminationConditionReached(generation)) {
 
-      generationSelector.selectSolutions(generation);
+      generationSelector.selectSolutions(generation, geneticAlgorithmConfiguration);
 
       generation = generationBreeder.breedNewGeneration(generation);
 
