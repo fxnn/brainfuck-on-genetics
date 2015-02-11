@@ -10,9 +10,12 @@ public class LinearComputationFitnessFunction implements FitnessFunction<DataInp
 
   public static final int EXPECTED_DIFFERENCE = 1;
 
+  public static final double LENGTH_COEFFICIENT = 0.01;
+
   @Override
   public double computeFitness(DataInput dataInput) {
     double result = 0.0;
+    int inputLength = 0;
 
     Integer previous = null;
     boolean eofReached = false;
@@ -26,6 +29,7 @@ public class LinearComputationFitnessFunction implements FitnessFunction<DataInp
         }
 
         previous = current;
+        inputLength++;
 
       } catch (EOFException e) {
         eofReached = true;
@@ -34,6 +38,6 @@ public class LinearComputationFitnessFunction implements FitnessFunction<DataInp
       }
     }
 
-    return result;
+    return result + (LENGTH_COEFFICIENT * inputLength);
   }
 }

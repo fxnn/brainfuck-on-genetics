@@ -26,7 +26,7 @@ public class BrainfuckOnGeneticsApplication {
 
   public static void main(String[] args) throws ExecutionException, InterruptedException {
 
-    Generation<Program> generation = initializeGeneration(10, 1000, 100);
+    Generation<Program> generation = initializeGeneration(1, 1000, 10);
 
     printGeneration(generation);
 

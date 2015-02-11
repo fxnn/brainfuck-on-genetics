@@ -22,12 +22,24 @@ public class LinearComputationFitnessFunctionTest {
   }
 
   @Test
-  public void testFitnessOfLinearInputWithCoefficientOneWithAnyLength() {
+  public void testFitnessOfLinearInputWithCoefficientOneWithFixedLength() {
 
-    assertFitnessIs(0.0, input(1, 2));
-    assertFitnessIs(0.0, input(1, 2, 3, 4, 5, 6, 7, 8, 9));
-    assertFitnessIs(0.0, input(91, 92, 93, 94, 95, 96, 97, 98, 99));
-    assertFitnessIs(0.0, input(-10, -9, -8, -7, -6, -5, -4, -3, -2));
+    double fitnessWithCoefficientOneAndLength10 = computeFitness(input(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
+
+    assertFitnessIs(fitnessWithCoefficientOneAndLength10, input(91, 92, 93, 94, 95, 96, 97, 98, 99, 100));
+    assertFitnessIs(fitnessWithCoefficientOneAndLength10, input(-10, -9, -8, -7, -6, -5, -4, -3, -2, -1));
+
+  }
+
+  @Test
+  public void testFitnessOfLongerInputIsHigher() {
+
+    double fitnessWithLengthNine = computeFitness(input(1, 2, 3, 4, 5, 6, 7, 8, 9));
+
+    assertFitnessIsSmallerThan(fitnessWithLengthNine, input(1, 2, 3, 4));
+    assertFitnessIsSmallerThan(fitnessWithLengthNine, input(1, 2));
+    assertFitnessIsSmallerThan(fitnessWithLengthNine, input(1));
+    assertFitnessIsSmallerThan(fitnessWithLengthNine, input());
 
   }
 
