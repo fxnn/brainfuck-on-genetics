@@ -7,10 +7,10 @@ import java.io.DataInputStream;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import de.fxnn.brainfuck.ProgramBuilder;
+import de.fxnn.brainfuck.ProgramOptimizer;
 import de.fxnn.brainfuck.program.Program;
 import de.fxnn.brainfuck.tape.InfiniteSignedIntegerTape;
 import de.fxnn.brainfuck.tape.TapeEofBehaviour;
-import de.fxnn.brainfuckongenetics.ProgramOptimizer;
 import de.fxnn.genetics.fitness.FitnessFunction;
 import lombok.AllArgsConstructor;
 

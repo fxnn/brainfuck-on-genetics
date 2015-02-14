@@ -1,4 +1,4 @@
-package de.fxnn.brainfuckongenetics;
+package de.fxnn.brainfuck;
 
 import java.util.Objects;
 import java.util.regex.Pattern;

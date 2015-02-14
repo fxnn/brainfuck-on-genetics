@@ -1,4 +1,4 @@
-package de.fxnn.brainfuckongenetics;
+package de.fxnn.brainfuck;
 
 import java.util.Iterator;
 import java.util.List;

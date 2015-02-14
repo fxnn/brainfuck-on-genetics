@@ -1,4 +1,4 @@
-package de.fxnn.brainfuckongenetics;
+package de.fxnn.brainfuck;
 
 import com.google.common.collect.Lists;
 import de.fxnn.brainfuck.program.Program;

@@ -5,7 +5,12 @@ import java.util.Random;
 
 import de.fxnn.genetics.generation.Generation;
 
-public class LinearProbabilityGenerationSelector implements GenerationSelector {
+public class SquareProbabilityGenerationSelector implements GenerationSelector {
+
+  /**
+   * Geringere Wahrscheinlichkeit, um über die gesamte Lösungsmenge min. einmal zu iterieren.
+   */
+  public static final double PROBABILITY_DEGRADATION_FACTOR = 0.01;
 
   @Override
   public <S> void selectSolutions(Generation<S> generation, GenerationSelectorConfiguration configuration) {
@@ -34,11 +39,17 @@ public class LinearProbabilityGenerationSelector implements GenerationSelector {
 
   protected <S> boolean selectSolution(S solution, Generation<S> generation, Random random,
       DoubleSummaryStatistics statistics) {
-    return random.nextDouble() < getProbability(generation.getFitness(solution), statistics);
+    return random.nextDouble() < PROBABILITY_DEGRADATION_FACTOR * getSquareProbability(generation.getFitness(solution),
+        statistics);
   }
 
-  protected double getProbability(double fitness, DoubleSummaryStatistics statistics) {
-    return (fitness - statistics.getMin()) / (statistics.getMax() - statistics.getMin());
+  protected double getSquareProbability(double fitness, DoubleSummaryStatistics statistics) {
+    if (Double.isFinite(fitness)) {
+      double linearProbability = (fitness - statistics.getMin()) / (statistics.getMax() - statistics.getMin());
+      return linearProbability * linearProbability;
+    }
+
+    return 0;
   }
 
   protected <S> DoubleSummaryStatistics calculateFitnessStatistics(Generation<S> generation) {

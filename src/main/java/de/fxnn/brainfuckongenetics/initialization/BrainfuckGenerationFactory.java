@@ -11,7 +11,6 @@ import de.fxnn.brainfuck.program.TreeProgram;
 import de.fxnn.brainfuckongenetics.operators.mutation.BrainfuckInsertingMutationOperator;
 import de.fxnn.genetics.fitness.ConcurrentTimeoutFitnessFunction;
 import de.fxnn.genetics.fitness.FitnessFunction;
-import de.fxnn.genetics.generation.Generation;
 import de.fxnn.genetics.generation.GenerationWithConcurrentFitnessFunction;
 import de.fxnn.genetics.initialization.GenerationFactory;
 import de.fxnn.genetics.initialization.GenerationFactoryConfiguration;
@@ -22,14 +21,14 @@ public class BrainfuckGenerationFactory implements GenerationFactory<Program> {
 
   private final ExecutorService executorService;
 
-  private final ScheduledExecutorService terminatingExecutorService;
+  private final ScheduledExecutorService watchdogExecutorService;
 
   private final long timeout;
 
   private final TimeUnit timeoutTimeUnit;
 
   @Override
-  public Generation<Program> initializeGeneration(GenerationFactoryConfiguration<Program> configuration) {
+  public GenerationWithConcurrentFitnessFunction<Program> initializeGeneration(GenerationFactoryConfiguration<Program> configuration) {
     GenerationWithConcurrentFitnessFunction<Program> generation = createEmptyGeneration(
         configuration.getPopulationSize(), configuration.getFitnessFunction());
 
@@ -62,6 +61,6 @@ public class BrainfuckGenerationFactory implements GenerationFactory<Program> {
   protected GenerationWithConcurrentFitnessFunction<Program> createEmptyGeneration(int maxPopulationSize,
       FitnessFunction<Program> fitnessFunction) {
     return new GenerationWithConcurrentFitnessFunction<>(maxPopulationSize,
-        new ConcurrentTimeoutFitnessFunction<>(executorService, terminatingExecutorService, fitnessFunction, timeout, timeoutTimeUnit));
+        new ConcurrentTimeoutFitnessFunction<>(executorService, watchdogExecutorService, fitnessFunction, timeout, timeoutTimeUnit));
   }
 }

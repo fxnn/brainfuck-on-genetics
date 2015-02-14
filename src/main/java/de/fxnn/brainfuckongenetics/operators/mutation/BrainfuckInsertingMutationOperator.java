@@ -3,11 +3,11 @@ package de.fxnn.brainfuckongenetics.operators.mutation;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
+import de.fxnn.brainfuck.ProgramSplitter;
 import de.fxnn.brainfuck.program.Program;
 import de.fxnn.brainfuck.program.StringProgram;
 import de.fxnn.brainfuck.program.TreeProgram;
 import de.fxnn.brainfuck.program.TreePrograms;
-import de.fxnn.brainfuckongenetics.ProgramSplitter;
 
 public enum BrainfuckInsertingMutationOperator implements BrainfuckMutationOperator {
 
