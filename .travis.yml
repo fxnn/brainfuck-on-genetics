@@ -1,8 +1,8 @@
 language: java
 jdk:
   - oraclejdk8
-before_script:
-  - git clone https://github.com/fxnn/brainfuck
-  - cd brainfuck
+before_install:
+  - git clone https://github.com/fxnn/brainfuck fxnn/brainfuck
+  - cd fxnn/brainfuck
   - mvn install -DskipTests=true
-  
+  - cd ../..
