@@ -16,12 +16,16 @@ import de.fxnn.brainfuckongenetics.job.JobCurrentlyRunningException;
 import de.fxnn.brainfuckongenetics.job.JobExecutionException;
 import de.fxnn.brainfuckongenetics.job.NoJobActiveException;
 import de.fxnn.genetics.generation.GenerationWithConcurrentFitnessFunction;
+import lombok.Getter;
 
 public class BrainfuckOnGeneticsShell implements ShellManageable {
 
   private final MavenProperties mavenProperties;
 
   private final BrainfuckGenerationDescriber brainfuckGenerationDescriber;
+
+  @Getter
+  private final Shell consoleShell;
 
   private BrainfuckOnGeneticsConfiguration configuration;
 
@@ -32,14 +36,15 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
     this.mavenProperties = mavenProperties;
     this.configuration = initialConfiguration;
     this.brainfuckGenerationDescriber = new BrainfuckGenerationDescriber();
+    this.consoleShell = createConsoleShell();
     this.job = new BrainfuckOnGeneticsJob();
   }
 
-  public Shell createConsoleShell() {
+  protected Shell createConsoleShell() {
     return ShellFactory.createConsoleShell(mavenProperties.getArtifactId(), getAppName(), this);
   }
 
-  private String getAppName() {
+  protected String getAppName() {
     return String.format("%s %s", mavenProperties.getArtifactId(), mavenProperties.getVersion());
   }
 
@@ -49,7 +54,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
   }
 
   @Command
-  public void populationSize(@Param(name="value") int value) {
+  public void populationSize(@Param(name = "value") int value) {
     configuration.setPopulationSize(value);
   }
 
@@ -59,7 +64,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
   }
 
   @Command
-  public void numberOfGenerationRounds(@Param(name="value") int value) {
+  public void numberOfGenerationRounds(@Param(name = "value") int value) {
     configuration.setNumberOfGenerationRounds(value);
   }
 
@@ -69,7 +74,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
   }
 
   @Command
-  public void randomSeed(@Param(name="value") long value) {
+  public void randomSeed(@Param(name = "value") long value) {
     configuration.setRandomSeed(value);
   }
 
@@ -79,7 +84,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
   }
 
   @Command
-  public void selectionRatio(@Param(name="value") double value) {
+  public void selectionRatio(@Param(name = "value") double value) {
     configuration.setSelectionRatio(value);
   }
 
@@ -95,7 +100,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
   }
 
   @Command
-  public void fitnessFunctionTimeout(@Param(name="seconds") long seconds) {
+  public void fitnessFunctionTimeout(@Param(name = "seconds") long seconds) {
     configuration.setFitnessFunctionTimeoutDuration(seconds);
     configuration.setFitnessFunctionTimeoutUnit(TimeUnit.SECONDS);
   }
@@ -105,7 +110,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
     try {
 
       job.start(configuration);
-      return "Job started.";
+      return "Job started at " + job.getTimestampStarted();
 
     } catch (JobCurrentlyRunningException e) {
       return "Job already running since " + formatSeconds(e.getRunDurationInMillis());
@@ -124,14 +129,30 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
     }
   }
 
+  @Command(name = "wait", abbrev = "w")
+  public String waitForCompletion() {
+    try {
+
+      job.waitForCompletion();
+      return "Job completed after " + formatSeconds(job.getJobRunDurationInMilliseconds());
+
+    } catch (NoJobActiveException e) {
+      return "No job started yet.";
+
+    } catch (InterruptedException e) {
+      return "Stopped waiting for job completion. Job is now running for " + formatSeconds(
+          job.getJobRunDurationInMilliseconds());
+
+    } catch (JobExecutionException e) {
+      return lines("ERROR: " + e.getMessage(), Throwables.getStackTraceAsString(e.getCause()));
+    }
+  }
+
   @Command
   public String result() {
     try {
 
-      return lines( //
-          "Job took " + formatSeconds(job.getJobRunDurationInMilliseconds()), //
-          brainfuckGenerationDescriber.describe(job.getLastResult()) //
-      );
+      return brainfuckGenerationDescriber.describe(job.getLastResult());
 
     } catch (NoJobActiveException e) {
       return "No job started yet.";
@@ -166,7 +187,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
     return String.format("%.3f s", millis / 1000.0);
   }
 
-  private String lines(String ... lines) {
+  private String lines(String... lines) {
     return Joiner.on(System.lineSeparator()).join(lines);
   }
 

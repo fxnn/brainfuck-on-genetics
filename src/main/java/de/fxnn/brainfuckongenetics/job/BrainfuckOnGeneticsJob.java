@@ -3,8 +3,6 @@ package de.fxnn.brainfuckongenetics.job;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
-import javax.annotation.Nonnull;
-
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -13,6 +11,7 @@ import de.fxnn.brainfuckongenetics.BrainfuckOnGeneticsAlgorithmFactory;
 import de.fxnn.brainfuckongenetics.BrainfuckOnGeneticsConfiguration;
 import de.fxnn.genetics.GeneticAlgorithm;
 import de.fxnn.genetics.generation.Generation;
+import lombok.Getter;
 
 public class BrainfuckOnGeneticsJob {
 
@@ -20,8 +19,10 @@ public class BrainfuckOnGeneticsJob {
 
   private ListenableFuture<Generation<Program>> future;
 
+  @Getter
   private Date timestampStarted;
 
+  @Getter
   private volatile Date timestampDone;
 
   public BrainfuckOnGeneticsJob() {
@@ -39,6 +40,18 @@ public class BrainfuckOnGeneticsJob {
     startClock();
     future = geneticAlgorithmExecutorService.submit(geneticAlgorithm);
     future.addListener(this::stopClock, MoreExecutors.directExecutor());
+  }
+
+  public void waitForCompletion() throws NoJobActiveException, InterruptedException, JobExecutionException {
+    if (!isJobRunning()) {
+      throw new NoJobActiveException();
+    }
+
+    try {
+      future.get();
+    } catch (ExecutionException e) {
+      throw new JobExecutionException("The job execution was cancelled with an error: " + e.getCause().toString(), e);
+    }
   }
 
   protected void startClock() {
@@ -78,38 +91,15 @@ public class BrainfuckOnGeneticsJob {
   }
 
   public long getJobRunDurationInMilliseconds() {
-    try {
-      if (isJobRunning()) {
-        return new Date().getTime() - getTimestampStarted().getTime();
-      }
-
-      return getTimestampDone().getTime() - getTimestampStarted().getTime();
-
-    } catch (JobCurrentlyRunningException | NoJobActiveException e) {
+    if (timestampStarted == null) {
       return 0;
     }
-  }
 
-  @Nonnull
-  public Date getTimestampStarted() throws NoJobActiveException {
-    if (timestampStarted == null) {
-      throw new NoJobActiveException();
-    }
-
-    return timestampStarted;
-  }
-
-  @Nonnull
-  public Date getTimestampDone() throws JobCurrentlyRunningException, NoJobActiveException {
     if (timestampDone == null) {
-      if (isJobRunning()) {
-        throw new JobCurrentlyRunningException(timestampStarted);
-      }
-
-      throw new NoJobActiveException();
+      return new Date().getTime() - getTimestampStarted().getTime();
     }
 
-    return timestampDone;
+    return getTimestampDone().getTime() - getTimestampStarted().getTime();
   }
 
   public boolean isJobRunning() {

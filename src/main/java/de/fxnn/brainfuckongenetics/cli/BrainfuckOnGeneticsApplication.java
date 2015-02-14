@@ -24,7 +24,7 @@ public class BrainfuckOnGeneticsApplication implements Runnable {
 
       BrainfuckOnGeneticsShell shell = new BrainfuckOnGeneticsShell(mavenProperties, configuration);
 
-      shell.createConsoleShell().commandLoop();
+      shell.getConsoleShell().commandLoop();
 
     } catch (IOException e) {
       e.printStackTrace();
