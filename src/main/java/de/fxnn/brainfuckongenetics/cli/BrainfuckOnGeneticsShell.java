@@ -144,7 +144,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
           job.getJobRunDurationInMilliseconds());
 
     } catch (JobExecutionException e) {
-      return lines("ERROR: " + e.getMessage(), Throwables.getStackTraceAsString(e.getCause()));
+      return errorWithStacktraceOfCause(e);
     }
   }
 
@@ -161,7 +161,7 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
       return "Job still running since " + formatSeconds(e.getRunDurationInMillis());
 
     } catch (JobExecutionException e) {
-      return lines("ERROR: " + e.getMessage(), Throwables.getStackTraceAsString(e.getCause()));
+      return errorWithStacktraceOfCause(e);
     }
   }
 
@@ -179,8 +179,12 @@ public class BrainfuckOnGeneticsShell implements ShellManageable {
       return "Job still running since " + formatSeconds(e.getRunDurationInMillis());
 
     } catch (JobExecutionException e) {
-      return lines("ERROR: " + e.getMessage(), Throwables.getStackTraceAsString(e.getCause()));
+      return errorWithStacktraceOfCause(e);
     }
+  }
+
+  private String errorWithStacktraceOfCause(Throwable e) {
+    return lines("ERROR: " + e.getMessage(), Throwables.getStackTraceAsString(e.getCause()));
   }
 
   private String formatSeconds(long millis) {
