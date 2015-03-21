@@ -36,6 +36,10 @@ $ cd brainfuck-on-genetics
 $ mvn package
 ```
 
+## Related work
+
+Yet to come. Until then, have a look at the [machine learning showcase](https://github.com/showcases/machine-learning) on GitHub.
+
 ## License
 
 Licensed under MIT, see for [LICENSE](LICENSE) file.
